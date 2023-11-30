@@ -1,0 +1,95 @@
+// Define structs for Item and Cart
+struct Item {
+    let id: Int
+    let name: String
+    let price: Double
+}
+
+struct CartItem {
+    let item: Item
+    var quantity: Int
+}
+
+// Define PointOfSale class
+class PointOfSale {
+    var inventory: [Item]
+    var cart: [CartItem]
+    
+    init(inventory: [Item]) {
+        self.inventory = inventory
+        self.cart = []
+    }
+    
+    func addItemToCart(item: Item, quantity: Int) {
+        // Check if item is available in inventory
+        guard inventory.contains(where: { $0.id == item.id }) else {
+            print("Item \(item.name) is not available.")
+            return
+        }
+        
+        // Check if item is already in cart
+        if let existingItemIndex = cart.firstIndex(where: { $0.item.id == item.id }) {
+            cart[existingItemIndex].quantity += quantity
+        } else {
+            let cartItem = CartItem(item: item, quantity: quantity)
+            cart.append(cartItem)
+        }
+        
+        print("Added \(quantity) \(item.name) to cart.")
+    }
+    
+    func removeItemFromCart(item: Item) {
+        // Check if item is in cart
+        guard let existingItemIndex = cart.firstIndex(where: { $0.item.id == item.id }) else {
+            print("Item \(item.name) is not in the cart.")
+            return
+        }
+        
+        // Remove item from cart
+        cart.remove(at: existingItemIndex)
+        print("Removed \(item.name) from cart.")
+    }
+    
+    func calculateTotal() -> Double {
+        var total: Double = 0
+        
+        for cartItem in cart {
+            let itemTotal = cartItem.item.price * Double(cartItem.quantity)
+            total += itemTotal
+        }
+        
+        return total
+    }
+    
+    func printReceipt() {
+        print("-------- Receipt --------")
+        for cartItem in cart {
+            let itemTotal = cartItem.item.price * Double(cartItem.quantity)
+            print("\(cartItem.item.name) x \(cartItem.quantity) - $\(itemTotal)")
+        }
+        print("-------------------------")
+        let total = calculateTotal()
+        print("Total: $\(total)")
+    }
+}
+
+// Create mock inventory
+let item1 = Item(id: 1, name: "Item A", price: 10.0)
+let item2 = Item(id: 2, name: "Item B", price: 15.0)
+let item3 = Item(id: 3, name: "Item C", price: 20.0)
+let inventory = [item1, item2, item3]
+
+// Create a point of sale instance
+let pos = PointOfSale(inventory: inventory)
+
+// Add items to cart
+pos.addItemToCart(item: item1, quantity: 2)
+pos.addItemToCart(item: item2, quantity: 1)
+pos.addItemToCart(item: item3, quantity: 3)
+
+// Remove an item from cart
+pos.removeItemFromCart(item: item2)
+
+// Print the receipt
+pos.printReceipt()
+```.
